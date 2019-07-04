@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# Summary: Speed up downloading Python in China
+#
+# Usage: pyenv download <python-version>
+#
+
+set -e
+[ -n "$PYENV_DEBUG" ] && set -x
+
+usage() {
+    pyenv-help download 2>/dev/null
+    [ -z "$1" ] || exit "$1"
+}
+
+if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+    usage 0
+fi
+
+URL="https://mirrors.huaweicloud.com/python"
+DIR="$HOME/.pyenv/cache/"
+FILE="Python-$1.tar.xz"
+
+if [ ! -d $DIR ]; then
+    mkdir $DIR
+fi
+
+if [ -f $DIR$FILE ]; then
+    echo "$FILE already exists"
+    exit 1
+fi
+
+if command -v wget >/dev/null 2>&1; then
+    wget -P $DIR "$URL/$1/$FILE"
+elif command -v curl >/dev/null 2>&1; then
+    curl -o "$DIR/Python-$1.tar.xz" "$URL/$1/$FILE"
+else
+    echo "WARNING: Need to install wget or curl"
+fi
